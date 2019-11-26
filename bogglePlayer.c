@@ -1,11 +1,11 @@
 /*
 
-  Authors (group members):
-  Email addresses of group members:
-  Group name:
+  Authors (group members): Brendan Shupp, Christopher Tinkler, John Dewey
+  Email addresses of group members: bshupp2018@my.fit.edu, ctinkler2018@my.fit.edu, jdewey2018@my.fit.edu
+  Group name: Hairy Hooligans
 
-  Course:
-  Section:
+  Course: CSE 2010
+  Section: 03
 
   Description of the overall algorithm and main data structures:
 
@@ -16,15 +16,121 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
+#include <ctype.h>
 #include "bogglePlayer.h"
 #include "word.h"
 
+
+//Struct to hold a letter's position
+typedef struct pos{
+
+	//Coordinates on map array
+	short y, x;
+
+}map_pos;
+
+//Struct to hold letter and its position
+typedef struct letter{
+
+	char letter;
+	map_pos position;
+
+}letter;
+
+//Library struct, holds values used in getWord()
+typedef struct library{
+
+	map_pos neighbor1, neighbor2;
+	char letters[16];
+	letter word[17];
+	short remaining;
+	short letter_pos;
+
+}library_file;
+
+char *table[128710]; //Hash Table
+
+void printTable(void){
+    for(int i = 0; i < 128710; i++){
+        if(table[i] != NULL)
+            printf("%d: %s\n", i, table[i]);
+    }
+}
+
+int getHash(char *word, int length){
+    int value = 0;
+    for(int i = 0; i < length; i++)
+        value += (int)word[i];
+    
+    value *= 2027;
+    while(value > 128710)
+        value /= 47;
+    
+    return value;
+}
+
+void insert(char *word){
+    int index = getHash(word, strlen(word)), spotVisited = 1;
+    if(table[index] != NULL){
+        for(int i = 0; table[index] != NULL; i++){
+            if(spotVisited == 128710)
+                return;
+            index += i;
+            if(index > 128710)
+                index %= 128710;
+            spotVisited++;
+        }
+    }
+    table[index] = (char*)malloc(30 * sizeof(char));
+    strcpy(table[index], word);
+}
+
+int checkWord(char *word){
+    int index = getHash(word, strlen(word));
+    if(table[index] == NULL)
+        return 0;
+    
+    if(strcmp(word, table[index])){
+        for(int i = 1; strcmp(table[index], word) != 0; i++){
+            index += 1;
+            if(index > 128710)
+                index %= 128710;
+            if(table[index] == NULL)
+                return 0;
+        }
+    }
+    if(strcmp(table[index], word))
+        return 1;
+    else
+        return 0;
+}
+
 // initialize BogglePlayer with a file of English words
 void initBogglePlayer(char* word_file) {
-
-
-  
-
+    int numWords = 0;
+    char str[31];
+    FILE *inp = fopen(word_file, "r");
+    while(!feof(inp)){
+        fgets(str, 30, inp);
+        int size = strlen(str) - 2;
+        str[size] = '\0';
+        for(int i = 0; i < size; i++){
+            str[i] = toupper(str[i]);
+        }
+        if(size > 3 && size < 9){
+            numWords++;
+            insert(str);
+        }
+    }/*
+    printTable();
+    printf("Num of Words: %d\n", numWords);
+    char checkStr[30];
+    printf("Enter a word to check: ");
+    scanf("%s", checkStr);
+    if(checkWord(checkStr))
+        printf("Word Found!\n");
+    else
+        printf("Word Not Found!\n");*/
 }
 
 
@@ -41,6 +147,21 @@ void      sampleWordList(WordList* myWords);   // a sample function to populate 
 //    their paths of locations on the board in myWords
 //
 // See word.h for details of the struct for Word, WordList, Location, and access functions
+/*
+WordList* getWords(char board[4][4]) {
+
+    WordList* myWords = getNewWordList(); 
+
+    sampleWordList(myWords);
+    
+    return myWords;
+}*/
+
+void acquireWord(libary_file* library){
+    short step = 0;
+    while(library->word[step].letter != '\0')
+        step++;
+}
 
 WordList* getWords(char board[4][4]) {
 
