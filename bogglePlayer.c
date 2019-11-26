@@ -20,34 +20,6 @@
 #include "bogglePlayer.h"
 #include "word.h"
 
-
-//Struct to hold a letter's position
-typedef struct pos{
-
-	//Coordinates on map array
-	short y, x;
-
-}map_pos;
-
-//Struct to hold letter and its position
-typedef struct letter{
-
-	char letter;
-	map_pos position;
-
-}letter;
-
-//Library struct, holds values used in getWord()
-typedef struct library{
-
-	map_pos neighbor1, neighbor2;
-	char letters[16];
-	letter word[17];
-	short remaining;
-	short letter_pos;
-
-}library_file;
-
 char *table[128710]; //Hash Table
 
 void printTable(void){
